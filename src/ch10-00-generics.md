@@ -27,7 +27,7 @@ class IntBox {
 
 Способ второй — хранить `Object`, раз от него наследуется всё:
 
-```java,wrong_behavior
+```java,throws
 class Box {
     private final Object value;
 

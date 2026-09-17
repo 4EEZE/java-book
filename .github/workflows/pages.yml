@@ -80,6 +80,7 @@ jobs:
       - name: Проверить квизы и стикеры
         run: |
           python3 check-quizzes.py
+          python3 check-code.py
           npm install --no-save --silent jsdom
           node theme/stickers.test.cjs
 

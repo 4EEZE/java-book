@@ -15,7 +15,7 @@
 
 ## `throw` и раскрутка стека
 
-```java
+```java,throws
 void main() {
     IO.println("до");
     fail();
