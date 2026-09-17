@@ -1,0 +1,108 @@
+[[questions]]
+id = "c564488e-e7b6-43df-ba64-2ae1632fe350"
+type = "Tracing"
+prompt.program = """
+void main() {
+    int max = Integer.MAX_VALUE;
+    IO.println(max + 1);
+}
+"""
+answer.doesCompile = true
+answer.stdout = "-2147483648"
+context = """
+Целые числа в Java переполняются молча: ни ошибки компиляции, ни исключения.
+Счётчик переехал через край и продолжил с другого конца.
+
+Когда переполнение недопустимо, используйте `Math.addExact` — он бросает
+`ArithmeticException` вместо того, чтобы соврать.
+"""
+
+[[questions]]
+id = "d34c3b07-12df-4855-b47c-5bb045757613"
+type = "Tracing"
+prompt.program = """
+void main() {
+    String greeting = "привет";
+    greeting.toUpperCase();
+    IO.println(greeting);
+}
+"""
+answer.doesCompile = true
+answer.stdout = "привет"
+context = """
+Строки неизменяемы. `toUpperCase()` не меняет строку, а возвращает новую — и
+эта новая здесь никуда не записана и тут же выброшена.
+
+Компилятор о такой бесполезной строке не предупреждает: вызвать метод и
+проигнорировать результат — законное действие.
+"""
+
+[[questions]]
+id = "6a050f83-af82-48d0-8394-4afb6bc4850b"
+type = "MultipleChoice"
+prompt.prompt = """
+Эта программа не компилируется:
+
+```java
+void main() {
+    int x = 1;
+    if (x) {
+        IO.println("да");
+    }
+}
+```
+
+Какое сообщение выдаст компилятор?
+"""
+answer.answer = "`incompatible types: int cannot be converted to boolean`"
+prompt.distractors = [
+  "`bad operand type int for condition`",
+  "`variable x might not have been initialized`",
+  "`cannot find symbol: method println(String)`"
+]
+context = """
+В Java нет истинности по умолчанию: ни число, ни строка, ни `null` не считаются
+логическим значением. Условие обязано иметь тип `boolean`, и компилятор говорит
+об этом на языке типов — «int не приводится к boolean», а не «плохой операнд».
+
+Чтобы проверить число, условие пишут явно: `if (x != 0)`.
+
+Взамен исчезает целый жанр ошибок: `if (x = 1)` вместо `if (x == 1)` здесь не
+пройдёт проверку типов, потому что результат присваивания — `int`.
+"""
+
+[[questions]]
+id = "ca3e0aa9-a55b-4421-bb78-fcaeb51783d0"
+type = "MultipleChoice"
+prompt.prompt = """
+`Integer a = 127, b = 127;` — сравнение `a == b` даёт `true`. А для
+`Integer c = 128, d = 128;` сравнение `c == d` даёт `false`. Почему?
+"""
+answer.answer = "`==` сравнивает ссылки, а значения от −128 до 127 виртуальная машина кеширует и переиспользует."
+prompt.distractors = [
+  "128 не помещается в `byte`, поэтому создаётся другой тип.",
+  "Это ошибка конкретной версии JVM.",
+  "`Integer` сравнивается по значению только до 127 по спецификации языка."
+]
+context = """
+Запоминать границу кеша не нужно — нужно не сравнивать объекты через `==`.
+Для `Integer` правильный способ — `c.equals(d)`, и он даёт `true` для любых
+значений.
+
+Правило: примитивы сравнивают через `==`, объекты — через `equals`.
+"""
+
+[[questions]]
+id = "c08e5227-b33f-4cdc-a300-d963b42612fc"
+type = "ShortAnswer"
+prompt.prompt = """
+В каком классе принято хранить денежные суммы, когда целых чисел в копейках
+недостаточно? Напишите имя класса.
+"""
+answer.answer = "BigDecimal"
+answer.alternatives = ["java.math.BigDecimal"]
+context = """
+`double` хранит число двоичной дробью, а 0.1 в двоичной системе не представима
+точно — отсюда `0.1 + 0.2` равное `0.30000000000000004`. `BigDecimal` считает в
+десятичной системе и этой погрешности не имеет.
+"""

@@ -1,0 +1,38 @@
+/* Подпись к листингу и имя файла над блоком кода */
+.filename,
+.caption {
+    display: block;
+    font-size: 0.85em;
+    color: var(--fg);
+    opacity: 0.75;
+}
+
+.filename {
+    margin-bottom: -0.7em;
+    font-family: var(--mono-font), monospace;
+}
+
+.caption {
+    margin-top: -0.7em;
+    margin-bottom: 1.4em;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Таблицы шире и без принудительной центровки */
+.content table {
+    width: 100%;
+    margin: 1.2em 0;
+}
+
+.content table td:first-child {
+    white-space: nowrap;
+}
+
+/* Цитаты-примечания заметнее, чем стандартные */
+.content blockquote {
+    border-inline-start: 4px solid var(--quote-border);
+    background: var(--quote-bg);
+    padding: 0.6em 1em;
+    margin: 1.4em 0;
+}

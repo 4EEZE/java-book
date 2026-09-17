@@ -1,0 +1,148 @@
+/* ── Оттенки для помеченных блоков кода и врезок ─────────────────────────── */
+
+:root {
+    --callout-modern: #c77b18;
+    --callout-deep: #5b5bd6;
+    --callout-praise: #2f8a4c;
+}
+
+body.coal,
+body.navy,
+body.ayu {
+    --callout-modern: #e8a33d;
+    --callout-deep: #9b9bf0;
+    --callout-praise: #5ec27e;
+}
+
+/*
+  Точные размеры стикеров считает stickers.js — по равной площади, иначе
+  вертикальные картинки читаются как более мелкие. Здесь только запасной
+  вариант на случай, если скрипт не отработал: высота задана, ширина
+  свободна, пропорции сохраняются.
+
+  max-width обязателен: базовое правило mdBook `.content img{max-width:100%}`
+  зажимает ширину по контейнеру, не трогая заданную высоту, и картинка
+  сплющивается. Сильнее всего это било по широким стикерам в узкой ячейке
+  таблицы введения.
+*/
+.sticker,
+.sticker-explain {
+    max-width: none;
+    width: auto;
+    pointer-events: none;
+}
+
+/* ── Стикер у блока кода ─────────────────────────────────────────────────── */
+
+pre.has-sticker {
+    position: relative;
+}
+
+/*
+  Фон помеченного блока намеренно НЕ переопределяется: он наследуется от темы
+  подсветки, как у любого другого блока кода. Метку несёт стикер — этого
+  достаточно, а любая заливка здесь упирается в контраст (запас до порога
+  4.5:1 у светлой темы — 0.034 яркости) и легко читается как «блок побелел».
+
+  Здесь же нет min-height: он растягивал бы `pre` ниже `code`, и в полоске
+  проступал бы фон `pre`. Однострочного блока и так хватает: 1rem отступа
+  сверху и снизу плюс строка дают около 53px, а стикер заканчивается на 40px.
+*/
+
+/* Код не должен заезжать под стикер. В rem, а не в em: у `code` свой
+   размер шрифта (0.875em), а стикер отмеряется от `pre`. */
+pre.has-sticker > code {
+    padding-right: 4.2rem;
+}
+
+.sticker-code {
+    position: absolute;
+    top: 0.4em;
+    right: 0.6em;
+    z-index: 5;
+    height: 2.2em;
+}
+
+/* Кнопка копирования у mdBook живёт в том же углу — сдвигаем её левее. */
+pre.has-sticker > .buttons {
+    right: 4.4em;
+}
+
+/* ── Врезка ──────────────────────────────────────────────────────────────── */
+
+/*
+  Сетка, а не обтекание: при обтекании длинный текст подползал под стикер.
+  Ширина первой колонки фиксирована — при равной площади ширина картинок
+  разная, и от «auto» левый край текста прыгал бы от врезки к врезке.
+*/
+.content blockquote.callout {
+    display: grid;
+    grid-template-columns: 4.3em minmax(0, 1fr);
+    column-gap: 1em;
+    align-items: start;
+    padding: 0.9em 1.1em;
+    border-inline-start: 4px solid var(--callout-color);
+    border-block: none;
+    background: var(--quote-bg);
+}
+
+.content blockquote.callout > :not(.sticker-callout) {
+    grid-column: 2;
+}
+
+.content blockquote.callout > :first-of-type {
+    margin-top: 0;
+}
+
+.content blockquote.callout > :last-child {
+    margin-bottom: 0;
+}
+
+.sticker-callout {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    height: 3.2em;
+}
+
+.callout-modern {
+    --callout-color: var(--callout-modern);
+}
+
+.callout-deep {
+    --callout-color: var(--callout-deep);
+}
+
+.callout-praise {
+    --callout-color: var(--callout-praise);
+}
+
+.content blockquote.callout strong:first-of-type {
+    color: var(--callout-color);
+}
+
+/* На узком экране стикер съедает половину строки — прячем, смысл несёт текст. */
+@media (max-width: 500px) {
+    .content blockquote.callout {
+        display: block;
+    }
+
+    .sticker-callout {
+        display: none;
+    }
+
+    pre.has-sticker > code {
+        padding-right: 3.4rem;
+    }
+}
+
+/* ── Пояснительная таблица во введении ───────────────────────────────────── */
+
+.sticker-explain {
+    height: 54px;
+}
+
+.content table td:has(> .sticker-explain) {
+    text-align: center;
+    white-space: normal;
+}

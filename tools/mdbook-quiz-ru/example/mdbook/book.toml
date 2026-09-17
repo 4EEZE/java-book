@@ -1,0 +1,9 @@
+[book]
+authors = ["Will Crichton"]
+language = "en"
+src = "src"
+title = "example"
+
+[preprocessor.quiz]
+fullscreen = true
+show-bug-reporter = true

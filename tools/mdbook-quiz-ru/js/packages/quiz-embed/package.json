@@ -1,0 +1,19 @@
+{
+  "name": "@wcrichto/quiz-embed",
+  "version": "0.3.12",
+  "depot": {
+    "platform": "browser"
+  },
+  "devDependencies": {
+    "@wcrichto/quiz": "workspace:^",
+    "@wcrichto/rust-editor": "^0.2.0",
+    "highlight.js": "^10.7.2",
+    "lodash": "^4.17.21",
+    "mobx": "^6.9.0",
+    "mobx-react": "^8.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-error-boundary": "^3.1.4",
+    "sass": "^1.62.1"
+  }
+}

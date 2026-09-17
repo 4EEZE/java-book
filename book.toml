@@ -1,0 +1,32 @@
+[book]
+title = "Язык программирования Java"
+authors = ["—"]
+language = "ru"
+src = "src"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+additional-css = ["theme/book.css", "theme/stickers.css"]
+additional-js = ["theme/stickers.js"]
+git-repository-url = ""
+edit-url-template = ""
+
+[output.html.playground]
+runnable = false
+
+[output.html.search]
+use-boolean-and = true
+limit-results = 20
+
+[output.html.fold]
+enable = true
+level = 1
+
+# Ключи здесь в snake_case: структура конфига препроцессора десериализуется
+# без rename_all, поэтому вариант через дефис serde молча проигнорирует.
+[preprocessor.quiz]
+fullscreen = true
+cache_answers = true
+default_language = "java"
+spellcheck = false

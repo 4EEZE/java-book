@@ -1,0 +1,38 @@
+@import "@wcrichto/quiz/dist/lib.scss";
+
+:root {
+  --mdbook-fg: var(--fg);
+  --mdbook-bg: var(--bg);
+  --mdbook-light-border-color: var(--theme-popup-border);
+  --mdbook-heavy-border-color: var(--searchresults-border-color);
+
+  --mdbook-button-bg: var(--searchbar-bg);
+  --mdbook-button-fg: var(--searchbar-fg);
+  --mdbook-button-border-color: var(--searchresults-border-color);
+
+  --mdbook-prompt-bg: var(--quote-bg);
+  
+  --mdbook-icon-color: var(--icons);
+
+  --mdbook-multipart-bg: var(--theme-popup-bg);
+}
+
+.ayu {
+  --mdbook-highlight: #46480f;
+}
+
+.coal {
+  --mdbook-highlight: #46480f;
+}
+
+.light {
+  --mdbook-highlight: #ffffc1;
+}
+
+.navy {
+  --mdbook-highlight: #46480f;
+}
+
+.rust {
+  --mdbook-highlight: #fdf2ca;
+}

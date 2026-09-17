@@ -1,0 +1,11 @@
+{
+  "name": "js-new",
+  "validation": {
+    "invalidLink": true,
+    "notExported": true
+  },
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "packages/quiz"
+  ]
+}

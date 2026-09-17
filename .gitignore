@@ -1,0 +1,4 @@
+book/
+tools/mdbook-quiz-ru/target/
+tools/mdbook-quiz-ru/js/node_modules/
+tools/mdbook-quiz-ru/js/packages/*/node_modules/

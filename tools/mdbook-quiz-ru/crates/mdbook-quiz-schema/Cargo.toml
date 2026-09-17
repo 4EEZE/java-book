@@ -1,0 +1,24 @@
+[package]
+name = "mdbook-quiz-schema"
+description = "Schema for quizzes used in mdbook-quiz"
+version = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+
+[features]
+# for generating a JSON schema, used in conjunction with `cargo run --bin gen-json-schema`
+json-schema = ["dep:schemars", "dep:serde_json"]
+
+# for generating Typescript bindings, used in conjunction with `cargo test export_bindings`
+ts = ["dep:ts-rs"]
+
+[dependencies]
+serde = {version = "1", features = ["derive"]}
+ts-rs = {version = "7.0.0", optional = true}
+schemars = {version = "0.8.15", optional = true}
+serde_json = {version = "1", optional = true}
+
+[dev-dependencies]
+toml = { workspace = true }

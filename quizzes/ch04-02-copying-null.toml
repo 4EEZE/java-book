@@ -1,0 +1,87 @@
+[[questions]]
+id = "8fcc80fd-d395-4ae5-a1da-5270c214d717"
+type = "Tracing"
+prompt.program = """
+import java.util.ArrayList;
+import java.util.List;
+
+void main() {
+    List<String> original = new ArrayList<>();
+    original.add("первый");
+
+    List<String> backup = original;
+    original.add("второй");
+
+    IO.println(backup);
+}
+"""
+answer.doesCompile = true
+answer.stdout = "[первый, второй]"
+context = """
+Переменная названа `backup`, но копии не сделано: это два имени одного списка.
+Настоящая копия создаётся явно — `new ArrayList<>(original)`.
+
+Компилируется, не падает, делает не то — самый неприятный вид ошибки.
+"""
+
+[[questions]]
+id = "b90256cc-b57e-489e-a458-91abf53edee8"
+type = "MultipleChoice"
+prompt.prompt = """
+Что произойдёт при выполнении такого кода?
+
+```java
+final List<String> items = new ArrayList<>();
+items.add("первый");
+```
+"""
+answer.answer = "Ничего особенного: элемент добавится, `final` этому не мешает."
+prompt.distractors = [
+  "Ошибка компиляции: список помечен `final`.",
+  "Исключение `UnsupportedOperationException` во время работы.",
+  "Элемент не добавится, но и ошибки не будет."
+]
+context = """
+`final` фиксирует имя, а не содержимое: запрещено лишь присвоить `items` другой
+список. Если нужна неизменяемость содержимого, её обеспечивает сам объект —
+например, `List.of(...)`, который на `add` бросает
+`UnsupportedOperationException`.
+"""
+
+[[questions]]
+id = "58b2d855-3252-4087-b83b-9a3c9ed46f81"
+type = "Tracing"
+prompt.program = """
+void main() {
+    String name = null;
+    IO.println(name);
+    IO.println(name == null);
+}
+"""
+answer.doesCompile = true
+answer.stdout = """
+null
+true
+"""
+context = """
+Напечатать `null` можно — `println` обрабатывает его отдельно и выводит слово
+`null`. А вот вызвать у него метод нельзя: `name.length()` дал бы
+`NullPointerException`.
+
+Сравнение с `null` через `==` — единственный случай, когда `==` для ссылочного
+типа всегда уместен.
+"""
+
+[[questions]]
+id = "98f32805-a653-4d79-89e2-4a4ee86b588b"
+type = "ShortAnswer"
+prompt.prompt = """
+Каким методом из класса `Objects` принято проверять аргумент на `null` в начале
+метода, чтобы упасть сразу и с внятным сообщением? Напишите имя метода.
+"""
+answer.answer = "requireNonNull"
+answer.alternatives = ["Objects.requireNonNull"]
+context = """
+Смысл проверки — обнаружить ошибку там, где `null` появился, а не через двадцать
+строк, где на него наконец наступили.
+"""

@@ -1,0 +1,171 @@
+[[questions]]
+id = "2337a86d-de00-4a3c-a961-2bab5e1126db"
+type = "Tracing"
+prompt.program = """
+import java.util.HashSet;
+import java.util.Set;
+
+class Point {
+    final int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Point p && p.x == x && p.y == y;
+    }
+}
+
+void main() {
+    Point a = new Point(1, 2);
+    Point b = new Point(1, 2);
+
+    IO.println(a.equals(b));
+
+    Set<Point> set = new HashSet<>();
+    set.add(a);
+    IO.println(set.contains(b));
+    set.add(b);
+    IO.println(set.size());
+}
+"""
+answer.doesCompile = true
+answer.stdout = """
+true
+false
+2
+"""
+context = """
+`equals` переопределён, `hashCode` — нет. Поиск в `HashSet` идёт не перебором:
+сначала `hashCode()` указывает ячейку, и только внутри неё сравниваются
+элементы. Разные хеши отправили равные точки в разные ячейки, и до `equals`
+дело вообще не дошло.
+
+В итоге множество без повторов содержит два одинаковых элемента. Отсюда
+правило: переопределяя `equals`, всегда переопределяйте `hashCode`.
+"""
+
+[[questions]]
+id = "53568e67-c723-470c-a38a-7a6caf988c3b"
+type = "MultipleChoice"
+prompt.prompt = """
+Корректен ли `hashCode()`, который всегда возвращает `0`, при правильно
+написанном `equals`?
+"""
+answer.answer = "Корректен: контракт соблюдён и программа работает правильно, но словарь и множество резко замедляются."
+prompt.distractors = [
+  "Некорректен: контракт требует, чтобы разные объекты давали разные хеши.",
+  "Корректен и на скорость не влияет: хеш нужен только для равенства.",
+  "Некорректен: такой код не скомпилируется."
+]
+context = """
+Контракт требует лишь одного в эту сторону: равные объекты дают равные хеши.
+Ноль это условие выполняет. Коллизии — когда неравные объекты получают
+одинаковый хеш — разрешены.
+
+Но все элементы попадут в одну ячейку, и поиск из вычисления превратится в
+перебор: `HashMap` с миллионом записей станет работать как список.
+
+`hashCode` отвечает за скорость, `equals` — за правильность. Плохой `hashCode`
+замедляет, неверный — ломает.
+"""
+
+[[questions]]
+id = "c476a775-2216-4ef3-a1d4-56765fad8755"
+type = "Tracing"
+prompt.program = """
+class Point {
+    final int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+
+    @Override public boolean equals(Object o) {
+        return o instanceof Point p && p.x == x && p.y == y;
+    }
+}
+
+class ColoredPoint extends Point {
+    final String color;
+    ColoredPoint(int x, int y, String c) { super(x, y); color = c; }
+
+    @Override public boolean equals(Object o) {
+        return o instanceof ColoredPoint p && p.x == x && p.y == y
+            && p.color.equals(color);
+    }
+}
+
+void main() {
+    Point p = new Point(1, 2);
+    ColoredPoint cp = new ColoredPoint(1, 2, "красный");
+    IO.println(p.equals(cp));
+    IO.println(cp.equals(p));
+}
+"""
+answer.doesCompile = true
+answer.stdout = """
+true
+false
+"""
+context = """
+Нарушена **симметричность**: `Point` видит в цветной точке обычную и
+соглашается, а `ColoredPoint` требует совпадения цвета и отказывается.
+
+Последствия хуже странного вывода: найдёт ли коллекция элемент, будет зависеть
+от того, что ищут и что лежит внутри, — то есть от порядка сравнения, который
+вы не контролируете.
+
+Общего решения нет. Либо сравнивать классы точно через `getClass()`, либо —
+обычно правильнее — не наследовать классы с `equals`, а использовать композицию.
+"""
+
+[[questions]]
+id = "d4c21dbf-f9ae-4be3-becc-4962695e6671"
+type = "MultipleChoice"
+prompt.prompt = """
+Зачем внутри своего `equals` сравнивать поля ссылочного типа через
+`Objects.equals(a, b)`, а не через `a.equals(b)`?
+"""
+answer.answer = "Поле может быть `null`, и прямой вызов дал бы `NullPointerException`."
+prompt.distractors = [
+  "`Objects.equals` работает быстрее за счёт кеширования.",
+  "`a.equals(b)` сравнивает ссылки, а `Objects.equals` — содержимое.",
+  "Так требует контракт `equals`, иначе нарушается транзитивность."
+]
+context = """
+`Objects.equals(x, y)` сначала сравнивает ссылки, потом проверяет `null`, и
+только потом вызывает `equals`. Два `null` считаются равными, `null` и
+значение — нет.
+"""
+
+[[questions]]
+id = "f26816e1-a352-40c3-80cf-07329fb09c76"
+type = "ShortAnswer"
+prompt.prompt = """
+Каким методом из класса `Objects` вычисляют `hashCode` по набору полей, не
+выписывая формулу руками? Напишите имя метода.
+"""
+answer.answer = "hash"
+answer.alternatives = ["Objects.hash", "hash()"]
+context = """
+`return Objects.hash(x, y);` — достаточно перечислить те же поля, что участвуют
+в `equals`. Наборы полей у этих двух методов обязаны совпадать.
+"""
+
+[[questions]]
+id = "ce5ee301-849b-42af-a55b-057e79e3f70d"
+type = "MultipleChoice"
+prompt.prompt = """
+Почему для типа, который просто описывает данные, эти три метода советуют не
+писать руками, а взять `record`?
+"""
+answer.answer = "Запись получает их сразу согласованными по всем полям, и нельзя ни забыть `hashCode`, ни разойтись в наборе полей, ни сломать симметричность."
+prompt.distractors = [
+  "Запись работает быстрее обычного класса за счёт особой реализации хеша.",
+  "В записи `equals` сравнивает ссылки, что надёжнее сравнения по полям.",
+  "У записи эти методы можно переопределить, а у класса нельзя."
+]
+context = """
+Симметричность у записи не сломать по отдельной причине: записи нельзя
+наследовать, а именно наследование её и ломает.
+
+Руками эти методы имеет смысл писать только в классах с поведением и изменяемым
+состоянием, где запись не подходит.
+"""

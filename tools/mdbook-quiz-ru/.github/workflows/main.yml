@@ -1,0 +1,44 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "v*"
+
+env:
+  AQUASCOPE_VERSION: 0.4.0
+  AQUASCOPE_TOOLCHAIN: nightly-2026-05-01
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/workflows/setup
+      - name: Install Aquascope
+        run: |
+          rustup toolchain install ${AQUASCOPE_TOOLCHAIN} -c rust-src,rustc-dev,llvm-tools-preview,miri
+          cargo +${AQUASCOPE_TOOLCHAIN} miri setup
+          echo "LD_LIBRARY_PATH=$($(rustup which --toolchain ${AQUASCOPE_TOOLCHAIN} rustc) --print target-libdir)" >> ${GITHUB_ENV}
+          curl -sSL https://github.com/cognitive-engineering-lab/aquascope/releases/download/v${AQUASCOPE_VERSION}/aquascope-x86_64-unknown-linux-gnu.tar.gz | tar -xz --directory=bin
+          echo "$(pwd)/bin" >> ${GITHUB_PATH}
+      - name: Test Rust package
+        run: cargo test --all-features --locked
+      - name: Lint Rust package
+        run: |
+          cargo clippy --all-features --locked -- -D warnings
+          cargo fmt --check
+      - name: Test JS package
+        run: depot build --lint-fail && depot test
+        working-directory: js
+      - name: Install mdbook-quiz
+        run: cargo install --path crates/mdbook-quiz --debug --locked
+      - name: Build example mdbook
+        run: mdbook build
+        working-directory: example/mdbook
+      - name: Build example standalone
+        run: depot build --lint-fail
+        working-directory: example/standalone

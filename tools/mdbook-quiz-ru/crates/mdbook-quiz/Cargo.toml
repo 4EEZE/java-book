@@ -1,0 +1,38 @@
+[package]
+name = "mdbook-quiz"
+description = "Interactive quizzes for your mdBook"
+version = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+include = ["/src", "/js"]
+readme = "../../README.md"
+
+[features]
+rust-editor = []
+aquascope = ["mdbook-aquascope"]
+source-map = []
+
+[dependencies]
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+anyhow = { workspace = true, features = ["backtrace"] }
+regex = "1"
+html-escape = "0.2"
+toml = { workspace = true }
+mdbook-preprocessor-utils = "0.3.0"
+mdbook-aquascope = { version = "=0.4.0", optional = true }
+mdbook-quiz-schema = { path = "../mdbook-quiz-schema", version = "0.5.0" }
+mdbook-quiz-validate = { path = "../mdbook-quiz-validate", version = "0.5.0" }
+toml_edit = "0.20.0"
+uuid = {version = "1.4.1", features = ["v4"]}
+log = "0.4.20"
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+mdbook-preprocessor-utils = { version = "0.3.0", features = ["testing"] }
+
+[build-dependencies]
+anyhow = { workspace = true }
+mdbook-preprocessor-utils = "0.3.0"
