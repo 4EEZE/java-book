@@ -32,23 +32,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Нужна валидатору квизов: он запускает примеры на настоящем JDK.
       # Версия не ниже 25 — книга использует IO.println и компактные файлы.
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '25'
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       # Сборка форка mdbook-quiz занимает минуты, поэтому кешируем.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -84,8 +80,12 @@ jobs:
           python3 check-quizzes.py
           node theme/stickers.test.cjs
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      # Эти два шага обращаются к Pages и без них падают, поэтому условие
+      # нужно и здесь, а не только на задаче deploy ниже.
+      - uses: actions/configure-pages@v6
+        if: ${{ !github.event.repository.private }}
+      - uses: actions/upload-pages-artifact@v5
+        if: ${{ !github.event.repository.private }}
         with:
           path: book
 
@@ -102,4 +102,4 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
