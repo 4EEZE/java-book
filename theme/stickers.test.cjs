@@ -3,8 +3,17 @@
 const fs = require("fs");
 const path = require("path");
 const BOOK = path.resolve(__dirname, "..");
-const { JSDOM } = require(path.join(BOOK,
-  "tools/mdbook-quiz-ru/js/node_modules/.pnpm/jsdom@22.1.0/node_modules/jsdom"));
+// jsdom берём обычным способом, а если его нет — из зависимостей форка
+// квизов, где он уже лежит после локальной сборки. Так тест не зависит от
+// того, собирался ли форк в этом запуске.
+const { JSDOM } = (() => {
+  try {
+    return require("jsdom");
+  } catch {
+    return require(path.join(BOOK,
+      "tools/mdbook-quiz-ru/js/node_modules/.pnpm/jsdom@22.1.0/node_modules/jsdom"));
+  }
+})();
 
 const check = (name, cond) => {
   console.log((cond ? "  ok   " : "  FAIL ") + name);

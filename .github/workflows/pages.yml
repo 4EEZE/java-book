@@ -75,9 +75,12 @@ jobs:
       - name: Собрать книгу
         run: mdbook build
 
+      # jsdom ставим отдельно: при попадании в кеш сборка форка пропускается,
+      # и его node_modules на раннере не появляются.
       - name: Проверить квизы и стикеры
         run: |
           python3 check-quizzes.py
+          npm install --no-save --silent jsdom
           node theme/stickers.test.cjs
 
       # Эти два шага обращаются к Pages и без них падают, поэтому условие
