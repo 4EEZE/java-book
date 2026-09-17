@@ -1,0 +1,105 @@
+# Сборка книги и публикация на GitHub Pages.
+#
+# Требует, чтобы репозиторий был публичным (на бесплатном тарифе Pages для
+# приватных репозиториев недоступны) и чтобы в настройках репозитория
+# Settings → Pages источником был выбран GitHub Actions.
+#
+# JDK здесь не для примеров книги, а для сборки: валидатор внутри
+# mdbook-quiz компилирует и запускает программу из каждого Tracing-вопроса и
+# сверяет вывод с записанным ответом. Без java сборка не пройдёт.
+
+name: Книга
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Параллельные публикации не нужны, но начатую не обрываем.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  MDBOOK_VERSION: v0.5.4
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Нужна валидатору квизов: он запускает примеры на настоящем JDK.
+      # Версия не ниже 25 — книга использует IO.println и компактные файлы.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Сборка форка mdbook-quiz занимает минуты, поэтому кешируем.
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/mdbook-quiz
+            tools/mdbook-quiz-ru/target
+          key: quiz-${{ runner.os }}-${{ hashFiles('tools/mdbook-quiz-ru/Cargo.lock', 'tools/mdbook-quiz-ru/js/packages/**/*.tsx', 'tools/mdbook-quiz-ru/crates/**/*.rs') }}
+
+      - name: Поставить mdBook
+        run: |
+          curl -sL "https://github.com/rust-lang/mdBook/releases/download/$MDBOOK_VERSION/mdbook-$MDBOOK_VERSION-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar xz -C /usr/local/bin
+
+      - name: Собрать локализованный mdbook-quiz
+        run: |
+          if [ -x "$HOME/.cargo/bin/mdbook-quiz" ]; then
+            echo "взят из кеша"; exit 0
+          fi
+          cd tools/mdbook-quiz-ru
+          cargo test -p mdbook-quiz-schema --locked export_bindings --features ts
+          mkdir -p js/packages/quiz/src/bindings
+          cp crates/mdbook-quiz-schema/bindings/* js/packages/quiz/src/bindings/
+          cd js && npx --yes pnpm@9 install
+          cd packages/quiz-embed && npx --yes pnpm@9 exec vite build --mode production
+          cd ../../.. && cargo install --path crates/mdbook-quiz --locked
+
+      # Валидатор ответов отработает здесь же: неверный ответ уронит сборку.
+      - name: Собрать книгу
+        run: mdbook build
+
+      - name: Проверить квизы и стикеры
+        run: |
+          python3 check-quizzes.py
+          node theme/stickers.test.cjs
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: book
+
+  # Пока репозиторий приватный, публикация пропускается: на бесплатном тарифе
+  # Pages для приватных репозиториев недоступны. Сборка выше при этом идёт и
+  # работает как проверка — она прогоняет все квизы и тесты стикеров.
+  # Сделаете репозиторий публичным — шаг включится сам.
+  deploy:
+    needs: build
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
