@@ -12,9 +12,6 @@ Brown University — с квизами после разделов, стикер
 ```console
 $ mdbook serve --open
 ```
-
----
-
 ---
 
 ## На чём основана
