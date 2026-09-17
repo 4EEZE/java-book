@@ -1,0 +1,57 @@
+[[questions]]
+id = "ad86b486-ef22-4b4d-96de-15355dfa11ef"
+type = "Tracing"
+prompt.program = """
+void main() {
+    IO.println(compute());
+}
+
+int compute() {
+    try {
+        return 1;
+    } finally {
+        return 2;
+    }
+}
+"""
+answer.doesCompile = true
+answer.stdout = "2"
+context = """
+`return` из `finally` затирает результат, уже готовый уйти из `try`.
+
+Хуже, что так же затирается и **исключение**: если бы `try` его выбросил, а
+`finally` сделал `return`, исключение молча исчезло бы. Поэтому в `finally` не
+должно быть ни `return`, ни `throw`, ни `break` — только освобождение ресурсов.
+"""
+
+[[questions]]
+id = "5132acc4-7c00-409d-8588-c9107d980b39"
+type = "Tracing"
+prompt.program = """
+void main() {
+    try {
+        IO.println("A");
+        throw new RuntimeException("x");
+    } catch (RuntimeException e) {
+        IO.println("B");
+    } finally {
+        IO.println("C");
+    }
+    IO.println("D");
+}
+"""
+answer.doesCompile = true
+answer.stdout = """
+A
+B
+C
+D
+"""
+context = """
+Исключение прервало `try` на месте броска, затем сработал `catch`, затем
+`finally`, и только потом выполнение пошло дальше.
+
+`finally` выполняется последним из трёх блоков, но раньше всего, что идёт за
+конструкцией. Раз исключение перехвачено, программа продолжает работу — поэтому
+`D` тоже напечаталось.
+"""

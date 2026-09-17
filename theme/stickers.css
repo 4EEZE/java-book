@@ -3,7 +3,6 @@
 :root {
     --callout-modern: #c77b18;
     --callout-deep: #5b5bd6;
-    --callout-praise: #2f8a4c;
 }
 
 body.coal,
@@ -11,7 +10,6 @@ body.navy,
 body.ayu {
     --callout-modern: #e8a33d;
     --callout-deep: #9b9bf0;
-    --callout-praise: #5ec27e;
 }
 
 /*
@@ -111,10 +109,6 @@ pre.has-sticker > .buttons {
 
 .callout-deep {
     --callout-color: var(--callout-deep);
-}
-
-.callout-praise {
-    --callout-color: var(--callout-praise);
 }
 
 .content blockquote.callout strong:first-of-type {

@@ -1,0 +1,72 @@
+[[questions]]
+id = "c022d2f6-a6fe-440c-9e56-2cd2c9007407"
+type = "Tracing"
+prompt.program = """
+import java.util.ArrayList;
+import java.util.List;
+
+void main() {
+    List<Integer> numbers = new ArrayList<>(List.of(1, 2, 3));
+    numbers.remove(1);
+    IO.println(numbers);
+}
+"""
+answer.doesCompile = true
+answer.stdout = "[1, 3]"
+context = """
+У списка два метода удаления: `remove(int)` убирает по **индексу**,
+`remove(Object)` — по **значению**. Вызов `remove(1)` подходит под первый, и
+удаляется элемент с индексом 1, то есть двойка.
+
+Чтобы удалить именно значение, его делают объектом явно:
+`remove(Integer.valueOf(1))` — тогда получится `[2, 3]`.
+"""
+
+[[questions]]
+id = "07dc31ac-4b2a-4ed8-90d6-323e5a1451d1"
+type = "Tracing"
+prompt.program = """
+import java.util.HashMap;
+import java.util.Map;
+
+void main() {
+    String[] words = {"кот", "пёс", "кот"};
+    Map<String, Integer> count = new HashMap<>();
+    for (String word : words) {
+        count.put(word, count.getOrDefault(word, 0) + 1);
+    }
+    IO.println(count.get("кот") + " " + count.get("пёс") + " " + count.get("ёж"));
+}
+"""
+answer.doesCompile = true
+answer.stdout = "2 1 null"
+context = """
+`getOrDefault(ключ, значение)` возвращает подстановку, когда ключа ещё нет, —
+поэтому счётчик начинается с нуля без всяких проверок.
+
+А вот обычный `get` для отсутствующего ключа возвращает `null`, что и видно в
+третьем значении. Если бы этот `null` попал в арифметику, программа упала бы с
+`NullPointerException`.
+
+Печатать словарь целиком здесь было бы неправильно: `HashMap` не обещает
+никакого порядка обхода.
+"""
+
+[[questions]]
+id = "5b0cafbf-e6ec-48cc-abf7-a95f3a2cc3f7"
+type = "MultipleChoice"
+prompt.prompt = """
+Почему принято писать `List<String> names = new ArrayList<>()`, а не
+`ArrayList<String> names = new ArrayList<>()`?
+"""
+answer.answer = "Чтобы реализацию можно было поменять, не трогая остальной код: `List` говорит, что это список, не уточняя, какой именно."
+prompt.distractors = [
+  "`ArrayList` слева работает медленнее из-за приведения типов.",
+  "Так требует компилятор: тип слева обязан быть интерфейсом.",
+  "`List` слева позволяет положить в список элементы любых типов."
+]
+context = """
+Это тот же принцип, что в главе 6: код зависит от того, что объект умеет, а не
+от того, как он устроен. Особенно важно для параметров методов — метод,
+принимающий `List`, примет любой список, а принимающий `ArrayList` — только его.
+"""

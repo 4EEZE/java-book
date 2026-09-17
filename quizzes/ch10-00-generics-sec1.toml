@@ -1,0 +1,78 @@
+[[questions]]
+id = "2da7201c-1fba-4b33-96f7-76b076a192cc"
+type = "Tracing"
+prompt.program = """
+import java.util.ArrayList;
+import java.util.List;
+
+void main() {
+    List<String> strings = new ArrayList<>();
+    List<Integer> numbers = new ArrayList<>();
+    IO.println(strings.getClass() == numbers.getClass());
+}
+"""
+answer.doesCompile = true
+answer.stdout = "true"
+context = """
+Во время работы программы `List<String>` и `List<Integer>` — один и тот же тип:
+`java.util.ArrayList`. Угловые скобки существуют только для компилятора, а
+после проверок он **стирает** информацию о параметре.
+
+Отсюда все ограничения обобщённых типов в Java: они работают до запуска, а не
+во время.
+"""
+
+[[questions]]
+id = "3e7f197f-c4db-4068-bddf-85ddd553bdce"
+type = "MultipleChoice"
+prompt.prompt = """
+Почему `new T[10]` внутри класса `Box<T>` не компилируется?
+"""
+answer.answer = "Массив во время работы проверяет тип записываемых элементов, а `T` к этому моменту стёрт — проверять нечего."
+prompt.distractors = [
+  "Размер массива обобщённого типа нельзя задавать числом.",
+  "Массивы вообще нельзя создавать внутри обобщённых классов.",
+  "Обобщённый массив создаётся другим синтаксисом, с пустыми фигурными скобками."
+]
+context = """
+Сообщение: `generic array creation`. Вместо массива берут `List<T>` — у него
+проверка типов происходит при компиляции и стирание ей не мешает.
+
+По той же причине нельзя написать `o instanceof List<String>`: информации о
+параметре во время работы уже нет.
+"""
+
+[[questions]]
+id = "caf09e8c-9cd4-4918-97f5-ffbb243df1f3"
+type = "Tracing"
+prompt.program = """
+import java.util.List;
+
+<T extends Comparable<T>> T max(List<T> items) {
+    T best = items.get(0);
+    for (T item : items) {
+        if (item.compareTo(best) > 0) {
+            best = item;
+        }
+    }
+    return best;
+}
+
+void main() {
+    IO.println(max(List.of(3, 7, 5)));
+    IO.println(max(List.of("б", "я", "а")));
+}
+"""
+answer.doesCompile = true
+answer.stdout = """
+7
+я
+"""
+context = """
+`<T extends Comparable<T>>` требует от типа умения сравниваться с собой — только
+поэтому `item.compareTo(best)` законен. Без ограничения компилятор знал бы о `T`
+лишь то, что это объект, и метода `compareTo` не нашёл бы.
+
+Один метод обслужил и числа, и строки: обобщённый метод сохраняет тип сквозь
+себя, поэтому возвращается именно `Integer` и именно `String`.
+"""

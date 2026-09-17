@@ -83,11 +83,11 @@ check("  стикер идёт первым, текст после",
 console.log("ch00-00-introduction.html:");
 doc = run("ch00-00-introduction.html");
 check("врезка «Современный подход» распознана", !!doc.querySelector("blockquote.callout-modern"));
-check("врезка «Получилось» распознана", !!doc.querySelector("blockquote.callout-praise"));
 
 // Стикеры разных врезок должны выглядеть одинаково крупными.
 const callouts = [...doc.querySelectorAll("img.sticker-callout")];
-check("врезок со стикерами несколько", callouts.length >= 3);
+// Видов врезок два: «Современный подход» и «Под капотом».
+check("врезок со стикерами несколько", callouts.length >= 2);
 const areas = callouts.map(area);
 check("у всех стикеров врезок равная площадь",
   Math.max(...areas) - Math.min(...areas) < 0.01);

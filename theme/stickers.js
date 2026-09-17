@@ -27,8 +27,7 @@ const CODE_MARKERS = [
 
 const CALLOUTS = [
   { marker: "Современный подход", cls: "modern", img: "clawd_idea_lightbulb.png" },
-  { marker: "Под капотом", cls: "deep", img: "clawd_nerd.png" },
-  { marker: "Получилось", cls: "praise", img: "clawd_happy.png" }
+  { marker: "Под капотом", cls: "deep", img: "clawd_nerd.png" }
 ];
 
 // Путь до корня книги mdBook кладёт в глобальную переменную: на вложенных

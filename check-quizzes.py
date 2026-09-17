@@ -18,10 +18,8 @@ STOP = {"java", "javac", "int", "String", "void", "main", "true", "false", "null
 DEFINED = re.compile(r"\b(?:class|interface|record|enum)\s+(\w+)|(\w+)\s*\(")
 
 def section_for(quiz: pathlib.Path) -> pathlib.Path:
-    exact = pathlib.Path("src") / (quiz.stem + ".md")
-    if exact.exists():
-        return exact
-    return next(iter(sorted(pathlib.Path("src").glob(quiz.stem.split("-")[0] + "*.md"))))
+    # ch08-00-collections-sec1.toml -> src/ch08-00-collections.md
+    return pathlib.Path("src") / (re.sub(r"-sec\d+$", "", quiz.stem) + ".md")
 
 problems, kinds, lengths = [], collections.Counter(), []
 
